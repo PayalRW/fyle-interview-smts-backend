@@ -140,7 +140,7 @@ def test_grade_already_provided_for_assignment(client, h_teacher_1):
 
 def test_auth_assert_in_grading_assignment_(client):
     """
-    failure case: If an assignment does not exists check and throw 404
+    failure case: Check if headers are not present then assert 401
     """
     response = client.post(
         '/teacher/assignments/grade',
@@ -158,7 +158,7 @@ def test_auth_assert_in_grading_assignment_(client):
 
 def test_assert_teacher_id_in_grading_assignment_(client, h_teacher_1_without_teacher):
     """
-    failure case: If an assignment does not exists check and throw 404
+    failure case: check if teacher_id is not in Headers then assert 403
     """
     response = client.post(
         '/teacher/assignments/grade',
