@@ -45,6 +45,22 @@ def test_grade_assignment_cross(client, h_teacher_2):
     assert data['error'] == 'FyleError'
 
 
+def test_grade_provided_for_assignment(client, h_teacher_1):
+    """
+    failure case: Provide grade for assignment
+    """
+    response = client.post(
+        '/teacher/assignments/grade',
+        headers=h_teacher_1
+        , json={
+                "id":  1,
+                "grade": "A"
+            }
+    )
+
+    assert response.status_code == 200
+
+
 def test_grade_assignment_bad_grade(client, h_teacher_1):
     """
     failure case: API should not allow only grades available in enum
@@ -61,7 +77,7 @@ def test_grade_assignment_bad_grade(client, h_teacher_1):
     assert response.status_code == 400
     data = response.json
 
-    assert data['error'] == 'ValidationError'
+    assert data['error'] == 'FyleError'
 
 
 def test_grade_assignment_bad_assignment(client, h_teacher_1):
@@ -97,6 +113,63 @@ def test_grade_assignment_draft_assignment(client, h_teacher_1):
     )
 
     assert response.status_code == 400
+    data = response.json
+
+    assert data['error'] == 'FyleError'
+
+
+def test_grade_already_provided_for_assignment(client, h_teacher_1):
+    """
+    failure case: If grades already provided throw error
+    """
+    response = client.post(
+        '/teacher/assignments/grade',
+        headers=h_teacher_1
+        , json={
+                "id":  1,
+                "grade": "A"
+            }
+    )
+
+    error_response = response.json
+
+    assert response.status_code == 400
+    assert error_response['error'] == 'FyleError'
+    assert error_response["message"] == 'Grade is already provided for this assignment'
+
+
+def test_auth_assert_in_grading_assignment_(client):
+    """
+    failure case: If an assignment does not exists check and throw 404
+    """
+    response = client.post(
+        '/teacher/assignments/grade',
+        json={
+            "id": 1,
+            "grade": "A"
+        }
+    )
+
+    assert response.status_code == 401
+    data = response.json
+
+    assert data['error'] == 'FyleError'
+
+
+def test_assert_teacher_id_in_grading_assignment_(client, h_teacher_1_without_teacher):
+    """
+    failure case: If an assignment does not exists check and throw 404
+    """
+    response = client.post(
+        '/teacher/assignments/grade',
+        headers=h_teacher_1_without_teacher,
+        json={
+            "id": 1,
+            "grade": "A"
+        }
+    )
+
+    assert response.status_code == 403
     data = response.json
 
     assert data['error'] == 'FyleError'

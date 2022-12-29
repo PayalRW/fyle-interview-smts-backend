@@ -4,3 +4,5 @@ omit =
     *__pycache__/*
     *.pytest_cache/*
     *tests/*
+    gunicorn_config.py
+    core/models/users.py
